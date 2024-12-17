@@ -13,6 +13,7 @@ const tagsSchema = new Schema<TTags>({
 const courseSchema = new Schema<TCourse>({
   title: {
     type: String,
+    unique: true,
     required: [true, "Course title is required"],
   },
   instructor: {
