@@ -42,21 +42,14 @@ const courseSchema = new Schema<TCourse>({
     type: String,
     required: [true, "Course language is required"],
   },
-  provider: {
-    type: String,
-    required: [true, "Course provider is required"],
-  },
-  durationInWeeks: {
-    type: Number,
-    required: [true, "Course duration is required"],
-  },
+  provider: String,
+  durationInWeeks: Number,
   details: {
     level: {
       type: String,
       enum: {
         values: courseLevel,
       },
-      required: [true, "Course level is required"],
     },
     description: String,
   },
