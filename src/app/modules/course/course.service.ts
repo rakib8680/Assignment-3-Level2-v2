@@ -18,9 +18,16 @@ const createCourse = async(payload:TCourse)=>{
 
 
 
+// get all courses
+const getAllCourses = async ()=>{
+    const result = await CourseModel.find();
+    return result;
+}
+
 
 
 
 export const CourseServices = {
-    createCourse
+    createCourse,
+    getAllCourses
 }

@@ -29,7 +29,7 @@ const courseSchema = new Schema<TCourse>({
     type: Number,
     required: [true, "Provide a price for the course"],
   },
-  tags: tagsSchema,
+  tags: [tagsSchema],
   startDate: {
     type: String,
     required: [true, "Start date is required"],

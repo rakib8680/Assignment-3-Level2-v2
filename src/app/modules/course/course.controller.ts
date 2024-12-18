@@ -14,6 +14,22 @@ const createCourse = async (req: Request, res: Response) => {
   });
 };
 
+
+
+// get all courses
+const getAllCourses = async (req: Request, res: Response) => {
+  const result = await CourseServices.getAllCourses();
+
+  res.status(200).json({
+    success: true,
+    statusCode: 200,
+    message: "Courses fetched successfully",
+    data: result,
+  });
+}
+
+
 export const CourseController = {
   createCourse,
+  getAllCourses
 };
