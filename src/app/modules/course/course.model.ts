@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import { TCourse, TTags } from "./course.interface";
 import { courseLevel } from "./course.constant";
+import { calculateDurationInWeeks } from "../../utils/calculateDurationInWeeks";
 
 const tagsSchema = new Schema<TTags>({
   name: {
@@ -53,6 +54,20 @@ const courseSchema = new Schema<TCourse>({
     },
     description: String,
   },
+});
+
+// pre save hook/middleware to calculate the duration in weeks
+courseSchema.pre("save", function (next) {
+  const course = this;
+
+  const durationInWeeks = calculateDurationInWeeks(
+    course.startDate,
+    course.endDate
+  );
+
+  course.durationInWeeks = durationInWeeks;
+
+  next();
 });
 
 export const CourseModel = model<TCourse>("course", courseSchema);
