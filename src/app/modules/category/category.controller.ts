@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import catchAsync from "../../utils/catchAsync";
 import { CategoryService } from "./category.service";
 
 // create category
-const createCategory = async (req: Request, res: Response) => {
+const createCategory = catchAsync(async (req, res) => {
   const categoryData = req.body;
   const result = await CategoryService.createCategory(categoryData);
   res.status(201).json({
@@ -11,12 +11,10 @@ const createCategory = async (req: Request, res: Response) => {
     message: "Category created successfully",
     data: result,
   });
-};
+});
 
-
-
-// get all categories 
-const getAllCategories = async (req: Request, res: Response) => {
+// get all categories
+const getAllCategories = catchAsync(async (req, res) => {
   const result = await CategoryService.getAllCategories();
   res.status(200).json({
     success: true,
@@ -24,10 +22,9 @@ const getAllCategories = async (req: Request, res: Response) => {
     message: "All categories fetched successfully",
     data: result,
   });
-}
-
+});
 
 export const CategoryController = {
   createCategory,
-  getAllCategories
+  getAllCategories,
 };
