@@ -56,6 +56,10 @@ const courseSchema = new Schema<TCourse>({
   },
 });
 
+
+
+
+
 // pre save hook/middleware to calculate the duration in weeks
 courseSchema.pre("save", function (next) {
   const course = this;
@@ -70,4 +74,8 @@ courseSchema.pre("save", function (next) {
   next();
 });
 
+
+
+
+// model 
 export const CourseModel = model<TCourse>("course", courseSchema);
