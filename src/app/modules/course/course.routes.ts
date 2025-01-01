@@ -12,4 +12,6 @@ router.post(
   CourseController.createCourse
 );
 
+router.put("/update-course/:id", CourseController.updateCourse);
+
 export const CourseRoutes = router;
