@@ -22,7 +22,12 @@ const createCourse = async(payload:TCourse)=>{
 const getAllCourses = async ()=>{
     const result = await CourseModel.find();
     return result;
-}
+};
+
+
+
+// update course 
+
 
 
 
