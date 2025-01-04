@@ -8,7 +8,6 @@ const handleCastError = (err: mongoose.Error.CastError): TErrorResponse => {
     ? `${match[1]} is not a valid id`
     : "Invalid Id";
 
-
   return {
     success: false,
     message: "Error",
