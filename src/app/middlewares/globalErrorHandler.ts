@@ -4,6 +4,7 @@ import { TErrorResponse } from "../types/TErrorResponse";
 import handleZodError from "../errors/handleZodError";
 import handleValidationError from "../errors/handleValidationError";
 import handleCastError from "../errors/handleCastError";
+import handleDuplicateKeyError from "../errors/handleDuplicateKeyError";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let errorResponse:TErrorResponse = {
@@ -24,6 +25,8 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     errorResponse = handleValidationError(err);
   }else if(err?.name ==="CastError"){
     errorResponse = handleCastError(err);
+  }else if (err.code === 11000){
+    errorResponse = handleDuplicateKeyError(err);
   }
 
 
