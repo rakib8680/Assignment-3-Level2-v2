@@ -1,4 +1,5 @@
 import QueryBuilder from "../../helpers/queryBuilder";
+import { courseSearchableFields } from "./course.constant";
 import { TCourse } from "./course.interface";
 import { CourseModel } from "./course.model";
 
@@ -8,24 +9,21 @@ const createCourse = async (payload: TCourse) => {
   return result;
 };
 
-
-
-
-
 // get all courses
-const getAllCourses = async (query:Record<string, unknown>) => {
+const getAllCourses = async (query: Record<string, unknown>) => {
 
-
-
-
+  // console.log(query);
   // const result = await CourseModel.find().populate('categoryId');
-  const courseQuery = new QueryBuilder(CourseModel.find().populate('categoryId'), query).filter()
-  .sort()
-  .paginate()
-  .fields();
-  
-  
-  
+  const courseQuery = new QueryBuilder(
+    CourseModel.find().populate("categoryId"),
+    query
+  )
+    .search(courseSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
   const result = await courseQuery.modelQuery;
   const meta = await courseQuery.countTotal();
 
@@ -33,14 +31,7 @@ const getAllCourses = async (query:Record<string, unknown>) => {
     meta,
     result,
   };
-
-
 };
-
-
-
-
-
 
 // update course
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {
