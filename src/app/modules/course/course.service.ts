@@ -12,7 +12,7 @@ const createCourse = async (payload: TCourse) => {
 // get all courses
 const getAllCourses = async (query: Record<string, unknown>) => {
 
-  // console.log(query);
+  console.log(query);
   // const result = await CourseModel.find().populate('categoryId');
   const courseQuery = new QueryBuilder(
     CourseModel.find().populate("categoryId"),

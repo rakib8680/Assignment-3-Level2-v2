@@ -9,6 +9,7 @@ class QueryBuilder<T> {
     this.query = query;
   }
 
+
   // Method to search documents based on a search term in specified fields
   search(searchableFields: string[]) {
     const { searchTerm } = this.query;
@@ -28,6 +29,10 @@ class QueryBuilder<T> {
   // Method to filter documents based on query parameters, excluding certain fields
   filter() {
     const queryObj = { ...this.query };
+    if(queryObj.level){
+      queryObj['details.level'] = queryObj.level;
+      delete queryObj.level;
+    }
     const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
@@ -50,6 +55,7 @@ class QueryBuilder<T> {
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
     return this;
   }
+
 
   // Method to select specific fields to be returned in the results
   fields() {
