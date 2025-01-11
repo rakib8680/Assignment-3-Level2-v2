@@ -54,10 +54,10 @@ class QueryBuilder<T> {
   }
 
   // Method to sort documents based on a sort parameter or default to '-createdAt'
-  sort() {
-    const sort =
-      (this.query.sort as string)?.split(",").join(" ") || "-createdAt";
-    this.modelQuery = this.modelQuery.sort(sort);
+  sort(sortOrder: 'asc' | 'desc' = 'desc') {
+    const sort =(this.query.sort as string)?.split(",").join(" ") || "createdAt";
+    const order = sortOrder === 'asc' ? '' : '-';
+    this.modelQuery = this.modelQuery.sort(order + sort);
     return this;
   }
 

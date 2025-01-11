@@ -20,7 +20,7 @@ const getAllCourses = async (query: Record<string, unknown>) => {
   )
     .search(courseSearchableFields)
     .filter()
-    .sort()
+    .sort(query.sortOrder as 'asc' | 'desc')
     .paginate()
     .fields();
 
