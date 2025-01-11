@@ -33,10 +33,24 @@ class QueryBuilder<T> {
       queryObj['details.level'] = queryObj.level;
       delete queryObj.level;
     }
+
+    if(queryObj.tags){
+      queryObj['tags.name'] = queryObj.tags;
+      delete queryObj.tags;
+    }
+
+
     const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
     return this;
+  }
+
+  filterPrice(){
+    const queryObj = { ...this.query };
+    if(queryObj.minPrice ){
+
+    }
   }
 
   // Method to sort documents based on a sort parameter or default to '-createdAt'
