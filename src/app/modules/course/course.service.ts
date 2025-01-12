@@ -12,17 +12,19 @@ const createCourse = async (payload: TCourse) => {
 // get all courses
 const getAllCourses = async (query: Record<string, unknown>) => {
 
-  console.log(query);
-  // const result = await CourseModel.find().populate('categoryId');
+  // console.log(query);
+  // const sortBy = query.sort as string;
+  // const sortOrder = query.sortOrder as string;
+  // const sortOptions = `${sortOrder === 'asc' ? '' : '-'}${sortBy}`;
+  // const result = await CourseModel.find().populate('categoryId').sort(sortOptions);
   const courseQuery = new QueryBuilder(
     CourseModel.find().populate("categoryId"),
     query
   )
     .search(courseSearchableFields)
     .filter()
-    .sort(query.sortOrder as 'asc' | 'desc')
+    .sort()
     .paginate()
-    .fields();
 
   const result = await courseQuery.modelQuery;
   const meta = await courseQuery.countTotal();
