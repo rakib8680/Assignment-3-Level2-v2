@@ -7,6 +7,13 @@ const createReview = async (payload: TReview) => {
   return result;
 };
 
+// get all reviews
+const getAllReviews = async () => {
+  const result = await ReviewModel.find().populate("courseId");
+  return result;
+}
+
 export const reviewServices = {
   createReview,
+  getAllReviews,
 };

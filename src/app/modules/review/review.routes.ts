@@ -5,6 +5,7 @@ const router = Router();
 
 
 router.post('/create-review', reviewController.createReview)
+router.get('/all-reviews', reviewController.getAllReviews)
 
 
 
