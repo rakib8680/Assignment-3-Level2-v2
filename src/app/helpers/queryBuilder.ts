@@ -40,7 +40,7 @@ class QueryBuilder<T> {
       queryObj["tags.name"] = queryObj.tags;
       delete queryObj.tags;
     }
-    const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
+    const excludeFields = ["searchTerm", "sort","sortOrder" ,"limit", "page", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
     return this;
@@ -64,21 +64,9 @@ class QueryBuilder<T> {
 
   // Method to sort documents based on a sort parameter or default to '-createdAt'
   sort() {
-    const queryObj = { ...this.query };
-    const sort = this.query.sort as string || "createdAt";
-    const sortOrder = this.query.sortOrder as string || "desc";
-    
-    // Ensure sortOrder is either "asc" or "desc"
-    const validSortOrder = sortOrder === "asc" ? "" : "-";
-    
-    // Construct sortOptions based on sortOrder
-    const sortOptions = `${validSortOrder}${sort}`;
-    
-    // if (sortOptions) {
-    //   console.log(sortOptions);
-    // }
-    
-    this.modelQuery = this.modelQuery.sort(sortOptions);
+   const sort = (this.query.sort as string) || "-createdAt";
+   const sortOrder = this.query.sortOrder === "asc" ? "" : "-";
+    this.modelQuery = this.modelQuery.sort(`${sortOrder}${sort}`);
     return this;
   }
 
