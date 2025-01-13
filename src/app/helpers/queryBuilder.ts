@@ -40,7 +40,7 @@ class QueryBuilder<T> {
       queryObj["tags.name"] = queryObj.tags;
       delete queryObj.tags;
     }
-    const excludeFields = ["searchTerm", "sort","sortOrder" ,"limit", "page", "fields"];
+    const excludeFields = ["searchTerm", "sort","sortOrder" ,"limit", "page", "fields", "minPrice", "maxPrice"];
     excludeFields.forEach((el) => delete queryObj[el]);
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
     return this;
@@ -48,17 +48,21 @@ class QueryBuilder<T> {
 
 
   // Method to filter documents, based on price range
-  // filterPrice() {
-  //   const queryObj = { ...this.query };
-  //   if (queryObj.price) {
-  //     const priceRange = queryObj.price as string;
-  //     const [minPrice, maxPrice] = priceRange.split("-");
-  //     this.modelQuery = this.modelQuery.find({
-  //       price: { $gte: minPrice, $lte: maxPrice },
-  //     });
-  //   }
-  //   return this;
-  // }
+  filterPrice() {
+    const { minPrice, maxPrice } = this.query;
+    const priceObj :any = {};
+    if(minPrice){
+      priceObj.$gte = minPrice;
+    }
+    if(maxPrice){
+      priceObj.$lte = maxPrice;
+    }
+    if(minPrice || maxPrice){
+      this.modelQuery = this.modelQuery.find({price: priceObj});
+    }
+    
+    return this;
+  }
 
 
 
