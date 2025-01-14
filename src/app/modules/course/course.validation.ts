@@ -28,6 +28,12 @@ const createCourseSchemaValidation = z.object({
   details: detailsSchemaValidation,
 });
 
+
+const updateCourseSchemaValidation = createCourseSchemaValidation.partial();
+
+
+
 export const courseValidations = {
   createCourseSchemaValidation,
+  updateCourseSchemaValidation,
 };
