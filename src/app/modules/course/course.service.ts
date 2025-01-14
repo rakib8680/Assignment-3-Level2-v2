@@ -19,7 +19,8 @@ const getAllCourses = async (query: Record<string, unknown>) => {
     .filter()
     .filterPrice()
     .sort()
-    .paginate();
+    .paginate()
+    .fields();
 
   const result = await courseQuery.modelQuery;
   const meta = await courseQuery.countTotal();
@@ -30,14 +31,20 @@ const getAllCourses = async (query: Record<string, unknown>) => {
   };
 };
 
+
+
+
 // update course
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {
+  const {tags,details, ...primitiveData} = payload;
   const result = await CourseModel.findByIdAndUpdate(id, payload, {
     new: true,
   });
 
   return result;
 };
+
+
 
 export const CourseServices = {
   createCourse,
