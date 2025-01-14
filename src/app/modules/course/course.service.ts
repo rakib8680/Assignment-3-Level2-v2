@@ -34,18 +34,38 @@ const getAllCourses = async (query: Record<string, unknown>) => {
 
 
 
+
+
+
+
+
 // update course
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {
-  const {tags,details, ...primitiveData} = payload;
+  const {tags,details, ...remainingCourseData} = payload;
 
-  
 
-  const result = await CourseModel.findByIdAndUpdate(id, payload, {
+  const modifiedUpdatableData : Record<string, unknown> = {...remainingCourseData};
+
+//  update details 
+  if(details && Object.keys(details).length){
+    for(const [key,value] of Object.entries(details)){
+        modifiedUpdatableData[`details.${key}`] = value;
+    }
+  }
+
+
+  const result = await CourseModel.findByIdAndUpdate(id, modifiedUpdatableData, {
     new: true,
   });
 
   return result;
 };
+
+
+
+
+
+
 
 
 
