@@ -9,7 +9,8 @@ const tagsSchema = new Schema<TTags>({
     required: [true, "Tag name is required"],
   },
   isDeleted: { type: Boolean, default: false },
-});
+  
+},{_id:false});
 
 const courseSchema = new Schema<TCourse>({
   title: {
