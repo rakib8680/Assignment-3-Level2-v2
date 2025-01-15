@@ -115,8 +115,6 @@ const updateCourse = async (id: string, payload: Partial<TCourse>) => {
   return result;
 };
 
-
-
 // get single course with reviews
 const getCourseWithReviews = async (id: string) => {
   const result = await CourseModel.aggregate([
@@ -146,11 +144,46 @@ const getCourseWithReviews = async (id: string) => {
   return result;
 };
 
+// get the best course based on average rating
+const getBestCourse = async () => {
+  const result = await CourseModel.aggregate([
+    {
+      $lookup: {  // join reviews collection
+        from: "reviews",
+        localField: "_id",
+        foreignField: "courseId",
+        as: "reviews",
+      },
+    },
+    {
+      $addFields: { // add averageRating and reviewCount fields
+        averageRating: { $round: [{ $avg: "$reviews.rating" }, 2] },
+        reviewCount: { $size: "$reviews" },
+      },
+    },
+    {
+      $sort: { // sort by averageRating and reviewCount in descending order
+        averageRating: -1,
+        reviewCount: -1,
+      },
+    },
+    {
+      $limit: 1, // get the first document
+    },
+    {
+      $project: { // remove reviews field
+        reviews: false,
+      },
+    },
+  ]);
 
+  return result;
+};
 
 export const CourseServices = {
   createCourse,
   getAllCourses,
   updateCourse,
   getCourseWithReviews,
+  getBestCourse,
 };

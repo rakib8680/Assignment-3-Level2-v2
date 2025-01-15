@@ -55,9 +55,23 @@ const getCourseWithReviews = catchAsync(async (req, res) => {
   });
 });
 
+
+// get the best course based on average rating 
+const getBestCourse = catchAsync(async (req, res) => {
+  const result = await CourseServices.getBestCourse();
+
+  res.status(status.OK).json({
+    success: true,
+    statusCode: status.OK,
+    message: "Best course fetched successfully",
+    data: result,
+  });
+});
+
 export const CourseController = {
   createCourse,
   getAllCourses,
   updateCourse,
-  getCourseWithReviews
+  getCourseWithReviews,
+  getBestCourse,
 };
