@@ -36,68 +36,62 @@ const getAllCourses = async (query: Record<string, unknown>) => {
 
 
 
-
-
-
-
-
 // update course
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {
-
   // separate non-primitive fields from payload
-  const {tags,details, ...remainingCourseData} = payload;
+  const { tags, details, ...remainingCourseData } = payload;
 
-  // update primitive data 
-  const updatePrimitiveData = await CourseModel.findByIdAndUpdate(id, remainingCourseData, {
+  // update primitive data
+  await CourseModel.findByIdAndUpdate(id, remainingCourseData, {
     new: true,
     runValidators: true,
-  })
+  });
 
-
-
-  const modifiedUpdatableData : Record<string, unknown> = {};
-//  update details 
-  if(details && Object.keys(details).length){
-    for(const [key,value] of Object.entries(details)){
-        modifiedUpdatableData[`details.${key}`] = value;
-    }
-  };
-
-
-
-  // update tags
-  if(tags && tags.length){
-    // filter out the deletable tags
-    const deletableTags = tags.filter((tag)=>tag.name && tag.isDeleted).map(tag =>tag.name);
-    
-    const deleteTagsFromCourse = await CourseModel.findByIdAndUpdate(id,{
-      $pull:{
-        tags:{
-          name:{
-            $in : deletableTags
-          }
-        }
-      }
-    })
-
-    if(!deleteTagsFromCourse){
-      throw new AppError(status.BAD_REQUEST,"failed to remove tags")
+  //  update details
+  const modifiedUpdatableData: Record<string, unknown> = {};
+  if (details && Object.keys(details).length) {
+    for (const [key, value] of Object.entries(details)) {
+      modifiedUpdatableData[`details.${key}`] = value;
     }
   }
-
-
-  const result = await CourseModel.findByIdAndUpdate(id, modifiedUpdatableData, {
+  await CourseModel.findByIdAndUpdate(id, modifiedUpdatableData, {
     new: true,
+    runValidators: true,
   });
+
+  // update tags
+  if (tags && tags.length) {
+    // filter out the deletable tags and remove them from the course
+    const deletableTags = tags
+      .filter((tag) => tag.name && tag.isDeleted)
+      .map((tag) => tag.name);
+
+    await CourseModel.findByIdAndUpdate(id, {
+      $pull: {
+        tags: {
+          name: {
+            $in: deletableTags,
+          },
+        },
+      },
+    });
+
+    // filter out the new tags and add them to the course
+    const newTags = tags.filter((tag) => tag.name && !tag.isDeleted);
+    await CourseModel.findByIdAndUpdate(id, {
+      $addToSet: {
+        tags: {
+          $each: newTags,
+        },
+      },
+    });
+  }
+
+  // fetch the updated course
+  const result = await CourseModel.findById(id).populate("categoryId");
 
   return result;
 };
-
-
-
-
-
-
 
 
 
