@@ -4,6 +4,7 @@ import QueryBuilder from "../../helpers/queryBuilder";
 import { courseSearchableFields } from "./course.constant";
 import { TCourse } from "./course.interface";
 import { CourseModel } from "./course.model";
+import mongoose from "mongoose";
 
 // create a course
 const createCourse = async (payload: TCourse) => {
@@ -41,57 +42,82 @@ const updateCourse = async (id: string, payload: Partial<TCourse>) => {
   // separate non-primitive fields from payload
   const { tags, details, ...remainingCourseData } = payload;
 
-  // update primitive data
-  await CourseModel.findByIdAndUpdate(id, remainingCourseData, {
-    new: true,
-    runValidators: true,
-  });
+  // use transaction to avoid data inconsistency in case of failure
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
 
-  //  update details
-  const modifiedUpdatableData: Record<string, unknown> = {};
-  if (details && Object.keys(details).length) {
-    for (const [key, value] of Object.entries(details)) {
-      modifiedUpdatableData[`details.${key}`] = value;
+    // // update primitive data (transaction-1)
+    // await CourseModel.findByIdAndUpdate(id, remainingCourseData, {
+    //   new: true,
+    //   runValidators: true,
+    //   session,
+    // });
+
+    //  update primitive data and  details (transaction-1)
+    const modifiedUpdatableData: Record<string, unknown> = {
+      ...remainingCourseData,
+    };
+    if (details && Object.keys(details).length) {
+      for (const [key, value] of Object.entries(details)) {
+        modifiedUpdatableData[`details.${key}`] = value;
+      }
     }
-  }
-  await CourseModel.findByIdAndUpdate(id, modifiedUpdatableData, {
-    new: true,
-    runValidators: true,
-  });
+    await CourseModel.findByIdAndUpdate(id, modifiedUpdatableData, {
+      new: true,
+      runValidators: true,
+      session,
+    });
 
-  // update tags
-  if (tags && tags.length) {
-    // filter out the deletable tags and remove them from the course
-    const deletableTags = tags
-      .filter((tag) => tag.name && tag.isDeleted)
-      .map((tag) => tag.name);
+    // update tags
+    if (tags && tags.length) {
+      // filter out the deletable tags and remove them from the course (transaction-2)
+      const deletableTags = tags
+        .filter((tag) => tag.name && tag.isDeleted)
+        .map((tag) => tag.name);
 
-    await CourseModel.findByIdAndUpdate(id, {
-      $pull: {
-        tags: {
-          name: {
-            $in: deletableTags,
+      await CourseModel.findByIdAndUpdate(
+        id,
+        {
+          $pull: {
+            tags: {
+              name: {
+                $in: deletableTags,
+              },
+            },
           },
         },
-      },
-    });
+        { session }
+      );
 
-    // filter out the new tags and add them to the course
-    const newTags = tags.filter((tag) => tag.name && !tag.isDeleted);
-    await CourseModel.findByIdAndUpdate(id, {
-      $addToSet: {
-        tags: {
-          $each: newTags,
+      // filter out the new tags and add them to the course (transaction-3)
+      const newTags = tags.filter((tag) => tag.name && !tag.isDeleted);
+      await CourseModel.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: {
+            tags: {
+              $each: newTags,
+            },
+          },
         },
-      },
-    });
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(status.INTERNAL_SERVER_ERROR, err);
   }
 
   // fetch the updated course
   const result = await CourseModel.findById(id).populate("categoryId");
-
   return result;
 };
+
 
 
 
