@@ -18,4 +18,6 @@ router.put(
   CourseController.updateCourse
 );
 
+router.get("/:id/reviews", CourseController.getCourseWithReviews);
+
 export const CourseRoutes = router;

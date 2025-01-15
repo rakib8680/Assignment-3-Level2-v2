@@ -34,9 +34,6 @@ const getAllCourses = async (query: Record<string, unknown>) => {
   };
 };
 
-
-
-
 // update course
 const updateCourse = async (id: string, payload: Partial<TCourse>) => {
   // separate non-primitive fields from payload
@@ -120,9 +117,40 @@ const updateCourse = async (id: string, payload: Partial<TCourse>) => {
 
 
 
+// get single course with reviews
+const getCourseWithReviews = async (id: string) => {
+  const result = await CourseModel.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(id) },
+    },
+    {
+      $lookup: {
+        from: "reviews",
+        localField: "_id",
+        foreignField: "courseId",
+        as: "reviews",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        provider: 1,
+        reviews: {
+          rating: 1,
+          review: 1,
+        },
+      },
+    },
+  ]);
+  return result;
+};
+
+
 
 export const CourseServices = {
   createCourse,
   getAllCourses,
   updateCourse,
+  getCourseWithReviews,
 };
