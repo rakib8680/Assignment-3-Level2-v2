@@ -5,6 +5,7 @@ import handleZodError from "../errors/handleZodError";
 import handleValidationError from "../errors/handleValidationError";
 import handleCastError from "../errors/handleCastError";
 import handleDuplicateKeyError from "../errors/handleDuplicateKeyError";
+import AppError from "../errors/AppError";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let errorResponse:TErrorResponse = {
@@ -27,7 +28,12 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     errorResponse = handleCastError(err);
   }else if (err.code === 11000){
     errorResponse = handleDuplicateKeyError(err);
-  }
+  }else if(err instanceof AppError){
+    errorResponse = {
+      success: false,
+      message: err.message,
+      errorMessage: err.message,
+  }}
 
 
   res.status(err.statusCode || 500).json({

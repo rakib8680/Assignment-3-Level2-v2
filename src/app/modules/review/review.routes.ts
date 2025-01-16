@@ -11,5 +11,6 @@ router.post(
   reviewController.createReview
 );
 router.get("/all-reviews", reviewController.getAllReviews);
+router.delete("/delete-review/:id", reviewController.deleteReview);
 
 export const ReviewRoutes = router;
